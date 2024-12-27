@@ -7,7 +7,7 @@ import com.example.latestmvvmblueprint.domain.repository.CoinRepository
 import dagger.assisted.AssistedInject
 import javax.inject.Inject
 
-class CoinRepositoryImpl @AssistedInject constructor(
+class CoinRepositoryImpl @Inject constructor(
     private val api: CoinPaprikaApi
 ): CoinRepository {
     override suspend fun getCoins(): List<CoinDto> {

@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class CoinListViewModel @AssistedInject constructor(
+class CoinListViewModel @Inject constructor(
     private val getCoinsUseCase: GetCoinsUseCase
 ): ViewModel() {
     private val _state = mutableStateOf(CoinListState())
