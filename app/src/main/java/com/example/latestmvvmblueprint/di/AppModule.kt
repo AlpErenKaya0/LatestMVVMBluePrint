@@ -4,6 +4,7 @@ import com.example.latestmvvmblueprint.common.Constants
 import com.example.latestmvvmblueprint.data.remote.CoinPaprikaApi
 import com.example.latestmvvmblueprint.data.repository.CoinRepositoryImpl
 import com.example.latestmvvmblueprint.domain.repository.CoinRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +15,16 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+interface AppModule {
+
+    @Binds
+    @Singleton
+    fun provideCoinRepository(impl: CoinRepositoryImpl): CoinRepository
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object AppNetworkModule {
 
     @Provides
     @Singleton
@@ -24,11 +34,5 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(CoinPaprikaApi::class.java)
-    }
-    @Provides
-    @Singleton
-    fun provideCoinRepository(api: CoinPaprikaApi): CoinRepositoryImpl {
-        return CoinRepositoryImpl(api)
-
     }
 }

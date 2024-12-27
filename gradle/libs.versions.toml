@@ -1,6 +1,6 @@
 [versions]
 agp = "8.7.3"
-kotlin = "2.0.0"
+kotlin = "2.1.0"
 coreKtx = "1.13.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -10,9 +10,9 @@ activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 comGoogleDevtoolsKspGradlePlugin = "1.5.30-1.0.0"
 hiltCommon = "1.2.0"
-hiltVersion = "2.51.1"
+hiltVersion = "2.54"
 hiltNavigationVersion = "1.2.0"
-ksp = "2.0.0-1.0.21"
+ksp = "2.1.0-1.0.29"
 serialization = "1.6.3"
 
 
