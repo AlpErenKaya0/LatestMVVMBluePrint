@@ -18,7 +18,7 @@ fun CoinTag(tag:String) {
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.primary,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.small
             )
             .padding(10.dp)
     ) {
@@ -26,7 +26,7 @@ fun CoinTag(tag:String) {
             text = tag,
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }

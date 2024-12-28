@@ -83,7 +83,7 @@ fun CoinDetailScreen(
                     Spacer(modifier = Modifier.height(15.dp))
                     Text(
                         text = "Team members",
-                        style = MaterialTheme.typography.displayMedium
+                        style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(15.dp))
                 }
