@@ -14,11 +14,17 @@ import javax.inject.Inject
 class GetCoinsUseCase @Inject constructor(
     private val repository: CoinRepository
 ) {
-    operator fun invoke(): Flow<Resource<List<Coin>>> = flow {
+    operator fun invoke(isSwitchOn: Boolean): Flow<Resource<List<Coin>>> = flow {
         try {
             emit(Resource.Loading<List<Coin>>())
+            // Switch durumu kontrolü
             val coins = repository.getCoins().map { it.toCoin() }
-            emit(Resource.Success(coins))
+            val filteredCoins = if (isSwitchOn) {
+                coins.filter { it.isActive ==false } // Sadece aktif coin'leri al
+            } else {
+                coins // Tüm coin'leri al
+            }
+            emit(Resource.Success(filteredCoins))
         } catch(e: HttpException) {
             emit(Resource.Error<List<Coin>>(e.localizedMessage ?: "An Error Occured."))
         } catch(e: IOException) {

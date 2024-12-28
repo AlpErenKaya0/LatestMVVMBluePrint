@@ -3,7 +3,8 @@ package com.example.latestmvvmblueprint.presentation.coin_list
 import com.example.latestmvvmblueprint.domain.model.Coin
 
 data class CoinListState(
-    val isLoading: Boolean = false,
     val coins: List<Coin> = emptyList(),
-    val error: String = ""
+    val isLoading: Boolean = false,
+    val error: String = "",
+    val isSwitchOn: Boolean =true  // Switch durumu
 )

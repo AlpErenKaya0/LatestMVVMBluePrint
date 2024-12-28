@@ -12,7 +12,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
-
 @HiltViewModel
 class CoinListViewModel @Inject constructor(
     private val getCoinsUseCase: GetCoinsUseCase
@@ -21,22 +20,28 @@ class CoinListViewModel @Inject constructor(
     val state: State<CoinListState> = _state
 
     init {
-        getCoins()
+        getCoins() // İlk başta verileri çekiyoruz
     }
+
     private fun getCoins(){
-        getCoinsUseCase().onEach {result ->
+        getCoinsUseCase(_state.value.isSwitchOn).onEach { result ->
             when(result) {
                 is Resource.Success -> {
-                    _state.value = CoinListState(coins = result.data ?: emptyList())
+                    _state.value = CoinListState(coins = result.data ?: emptyList(), isSwitchOn = _state.value.isSwitchOn)
                 }
                 is Resource.Error -> {
-                    _state.value = CoinListState(error = result.message ?:
-                    "An unexpected error occured")
+                    _state.value = CoinListState(error = result.message ?: "An unexpected error occurred", isSwitchOn = _state.value.isSwitchOn)
                 }
                 is Resource.Loading -> {
-                    _state.value = CoinListState(isLoading = true)
+                    _state.value = CoinListState(isLoading = true, isSwitchOn = _state.value.isSwitchOn)
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    // Switch durumu değiştiğinde çağrılacak fonksiyon
+    fun toggleSwitch(isChecked: Boolean) {
+        _state.value = _state.value.copy(isSwitchOn = isChecked) // Switch durumu güncelleniyor
+        getCoins() // Switch durumu değiştiğinde verileri tekrar çekiyoruz
     }
 }
