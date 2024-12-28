@@ -20,7 +20,7 @@ class GetCoinsUseCase @Inject constructor(
             // Switch durumu kontrolü
             val coins = repository.getCoins().map { it.toCoin() }
             val filteredCoins = if (isSwitchOn) {
-                coins.filter { it.isActive ==false } // Sadece aktif coin'leri al
+             coins.filter { it.isActive ==false } // Sadece aktif coin'leri al
             } else {
                 coins // Tüm coin'leri al
             }
