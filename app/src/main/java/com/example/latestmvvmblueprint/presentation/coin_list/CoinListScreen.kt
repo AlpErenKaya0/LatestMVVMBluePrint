@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -56,6 +57,9 @@ fun CoinListScreen(
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
     var searchBySymbolText by remember { mutableStateOf(TextFieldValue("")) }
+    var justNewDataChecked by remember { mutableStateOf(false) }
+    var isNewestCoinsSwitchOn by remember { mutableStateOf(false) }
+    var sortByNameCheckboxIsChecked by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Switch widget'ı
@@ -82,7 +86,7 @@ fun CoinListScreen(
             }
 
             Text(
-                text = if (state.isSwitchOn) "All Active Coins" else "All Coins",
+                text = if (state.isJustNewDataSwitchOn) "All Active Coins" else "All Coins",
                 modifier = Modifier.padding(16.dp)
             )
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -112,9 +116,7 @@ fun CoinListScreen(
     }
     if (showBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest = {
-                showBottomSheet = false
-            },
+            onDismissRequest = { showBottomSheet = false },
             sheetState = sheetState,
             shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
             containerColor = MaterialTheme.colorScheme.surface,
@@ -130,20 +132,33 @@ fun CoinListScreen(
                 )
             }
         ) {
-            Button(modifier = Modifier
-                .align(Alignment.End)
-                .padding(end = 6.dp, top = 6.dp)
-                ,
+            Button(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = 6.dp, top = 6.dp),
                 onClick = {
-                //BURADA İŞLEMLER YAPILACAK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                    if (!sheetState.isVisible) {
-                        showBottomSheet = false
+                    coroutineScope.launch {
+                        sheetState.hide()
+                    }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
+
+                        //viewModel'a coroutineScope içinden erişmeme gerek var mı emin değilim
+
+                            viewModel.FilterElementsStatus(
+                                isJustNewDataSwitchOn = justNewDataChecked,
+                                searchBySymbolText = searchBySymbolText.text.toString(),
+                                isNewCoinsSwitchOn = isNewestCoinsSwitchOn,
+                                sortByNameCheckboxIsChecked = sortByNameCheckboxIsChecked
+                            )
+
+                        }
                     }
                 }
-            }) {
+            ) {
                 Text("Apply Filters")
             }
+
             Column(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -157,33 +172,50 @@ fun CoinListScreen(
                     onValueChange = {
                         searchBySymbolText = it
                     },
-                    label = { Text(text = "Search a Crypto By Symbol ") },
+                    label = { Text(text = "Search a Crypto By Symbol") },
                     placeholder = { Text(text = "Have to search like BTC for Bitcoin") },
                 )
 
-
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    //StatesList gibi bir şey yapıp hepsini tek tek gösterebiliriz ${} ${} şeklinde gibi
-                    text = if (state.isSwitchOn) "Just Show Active Coins" else "Show All Coins",
+                    text = if (justNewDataChecked) "Just Show Active Coins" else "Show All Coins",
                     style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(end = 8.dp) // Switch'ten önce boşluk bırak
+                    modifier = Modifier.padding(end = 8.dp)
                 )
                 Switch(
-                    checked = state.isSwitchOn,
+                    checked = justNewDataChecked,
                     onCheckedChange = { checked ->
-                        //BURADA EĞER APPLYChanges'e tıklanmadan filtreleme yapılmayacaksa Buton'a tıklandığında
-                        // viewModel'a ulaşıp Filtrelemeyi yapacak kodu yazmak lazım
-
-                        //EKSTRA OLARAK VİEWMODEL'DA TOGGLESWİTCH DEĞİL TÜM FİLTRELER KONTROL EDİLMELİ
-                        viewModel.toggleSwitch(checked) // Switch durumu değiştiğinde ViewModel'a ilet
+                        justNewDataChecked = checked
                     }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = if (isNewestCoinsSwitchOn) "Just Fresh Coins" else "Show All Coins",
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Switch(
+                    checked = isNewestCoinsSwitchOn,
+                    onCheckedChange = { checked ->
+                        isNewestCoinsSwitchOn = checked
+                    }
+                )
 
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "alphabetically",
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Checkbox(
+                    checked = sortByNameCheckboxIsChecked,
+                    onCheckedChange = { checked ->
+                        sortByNameCheckboxIsChecked = checked
+                    },
+                    modifier = Modifier.padding(8.dp)
+                )
             }
         }
     }
 }
-

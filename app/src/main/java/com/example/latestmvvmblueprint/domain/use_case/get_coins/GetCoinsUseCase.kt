@@ -14,20 +14,45 @@ import javax.inject.Inject
 class GetCoinsUseCase @Inject constructor(
     private val repository: CoinRepository
 ) {
-    operator fun invoke(isSwitchOn: Boolean): Flow<Resource<List<Coin>>> = flow {
+    operator fun invoke( isSwitchOn: Boolean,
+                         searchBySymbolText: String,
+                         isNewCoinsSwitchOn: Boolean,
+                         sortByNameCheckboxIsChecked: Boolean
+    ): Flow<Resource<List<Coin>>> = flow {
         try {
             emit(Resource.Loading<List<Coin>>())
-            // Switch durumu kontrolü
+
             val coins = repository.getCoins().map { it.toCoin() }
-            val filteredCoins = if (isSwitchOn) {
-             coins.filter { it.isActive ==false } // Sadece aktif coin'leri al
-            } else {
-                coins // Tüm coin'leri al
+
+            // Filtreleme işlemleri
+            var filteredCoins = coins
+
+            // SYMBOL filtreleme
+            if (searchBySymbolText.isNotEmpty()) {
+                filteredCoins = filteredCoins.filter {
+                    it.symbol.uppercase() == searchBySymbolText
+                }
             }
+
+            // Active/Passive kontrolü
+            if (isSwitchOn) {
+                filteredCoins = filteredCoins.filter { it.isActive }
+            }
+
+            // Yeni coin kontrolü
+            if (isNewCoinsSwitchOn) {
+                filteredCoins = filteredCoins.filter { it.isNew }
+            }
+
+            // Alfabetik sıralama
+            if (sortByNameCheckboxIsChecked) {
+                filteredCoins = filteredCoins.sortedBy { it.name }
+            }
+
             emit(Resource.Success(filteredCoins))
-        } catch(e: HttpException) {
-            emit(Resource.Error<List<Coin>>(e.localizedMessage ?: "An Error Occured."))
-        } catch(e: IOException) {
+        } catch (e: HttpException) {
+            emit(Resource.Error<List<Coin>>(e.localizedMessage ?: "An Error Occurred."))
+        } catch (e: IOException) {
             emit(Resource.Error<List<Coin>>(e.localizedMessage ?: "Bad internet or Server Connection"))
         }
     }
