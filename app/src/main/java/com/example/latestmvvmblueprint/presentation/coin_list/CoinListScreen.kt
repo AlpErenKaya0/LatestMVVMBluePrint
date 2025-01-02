@@ -64,14 +64,14 @@ fun CoinListScreen(
     var sortByNameCheckboxIsChecked by remember { mutableStateOf(false) }
 
     //Launched Effect ile initial olarak filterları sanki varmış gibi atıyoruz
-    LaunchedEffect(Unit) {
-        viewModel.FilterElementsStatus(
-            isJustNewDataSwitchOn = justNewDataChecked,
-            searchBySymbolText = searchBySymbolText.text,
-            isNewCoinsSwitchOn = isNewestCoinsSwitchOn,
-            sortByNameCheckboxIsChecked = sortByNameCheckboxIsChecked
-        )
-    }
+//    LaunchedEffect(Unit) {
+//        viewModel.FilterElementsStatus(
+//            isJustNewDataSwitchOn = justNewDataChecked,
+//            searchBySymbolText = searchBySymbolText.text,
+//            isNewCoinsSwitchOn = isNewestCoinsSwitchOn,
+//            sortByNameCheckboxIsChecked = sortByNameCheckboxIsChecked
+//        )
+//    }
     //    produceState(initialValue = state.coins) {
 //        viewModel.FilterElementsStatus(
 //            isJustNewDataSwitchOn = justNewDataChecked,

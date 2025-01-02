@@ -18,7 +18,7 @@ class CoinListViewModel @Inject constructor(
 
     private val _state = mutableStateOf(CoinListState())
     private val _searchBySymbolText = mutableStateOf("")
-    private val _isNewCoinsSwitchOn = mutableStateOf(true)
+    private val _isNewCoinsSwitchOn = mutableStateOf(false)
     private val _sortByNameCheckboxIsChecked = mutableStateOf(false)
 
     val state: State<CoinListState> = _state
