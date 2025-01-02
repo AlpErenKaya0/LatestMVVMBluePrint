@@ -29,6 +29,8 @@ class CoinListViewModel @Inject constructor(
 
     private fun getCoins() {
         getCoinsUseCase(
+            //Burada initial olarak çekilen listede saçma sapan itemlar gelme noktasında bir
+            //sorun var
             isSwitchOn = _state.value.isJustNewDataSwitchOn,
             searchBySymbolText = _searchBySymbolText.value,
             isNewCoinsSwitchOn = _isNewCoinsSwitchOn.value,
