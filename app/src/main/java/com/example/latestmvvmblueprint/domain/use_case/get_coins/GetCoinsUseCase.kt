@@ -27,6 +27,9 @@ class GetCoinsUseCase @Inject constructor(
             // Filtreleme işlemleri
             var filteredCoins = coins
 
+            if (searchBySymbolText == null || isSwitchOn == null || isNewCoinsSwitchOn == null || sortByNameCheckboxIsChecked == null){
+                emit(Resource.Success(coins))
+            }
             // SYMBOL filtreleme
             if (searchBySymbolText.isNotEmpty()) {
                 filteredCoins = filteredCoins.filter {
@@ -40,6 +43,7 @@ class GetCoinsUseCase @Inject constructor(
             }
 
             // Yeni coin kontrolü
+            //BURADA SORUN VAR LAUNCHEDEFFECT'E GEREK BİLE OLMAYABİLİR.
             if (isNewCoinsSwitchOn) {
                 filteredCoins = filteredCoins.filter { it.isNew }
             }

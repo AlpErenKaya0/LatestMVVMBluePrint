@@ -72,6 +72,14 @@ fun CoinListScreen(
             sortByNameCheckboxIsChecked = sortByNameCheckboxIsChecked
         )
     }
+    //    produceState(initialValue = state.coins) {
+//        viewModel.FilterElementsStatus(
+//            isJustNewDataSwitchOn = justNewDataChecked,
+//            searchBySymbolText = searchBySymbolText.text,
+//            isNewCoinsSwitchOn = isNewestCoinsSwitchOn,
+//            sortByNameCheckboxIsChecked = sortByNameCheckboxIsChecked
+//        )
+//    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
