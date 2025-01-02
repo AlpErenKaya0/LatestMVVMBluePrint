@@ -1,5 +1,6 @@
 package com.example.latestmvvmblueprint.presentation.coin_list
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,7 +58,7 @@ fun CoinListScreen(
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
     var searchBySymbolText by remember { mutableStateOf(TextFieldValue("")) }
-    var justNewDataChecked by remember { mutableStateOf(false) }
+    var justNewDataChecked by remember { mutableStateOf(true) }
     var isNewestCoinsSwitchOn by remember { mutableStateOf(false) }
     var sortByNameCheckboxIsChecked by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
@@ -91,11 +92,13 @@ fun CoinListScreen(
             )
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(state.coins) { coin ->
+                    Log.d("CoinListScreen", "This coin has just been added to the screen: ${coin}")
                     CoinListItem(
                         coin = coin,
                         onItemClick = {
                             if (navController != null) navController.navigate(Screen.CoinDetailScreen.route + "/${coin.id}")
                         })
+
                 }
             }
         }
