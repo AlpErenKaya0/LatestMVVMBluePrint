@@ -14,10 +14,10 @@ import javax.inject.Inject
 class GetCoinsUseCase @Inject constructor(
     private val repository: CoinRepository
 ) {
-    operator fun invoke( isSwitchOn: Boolean,
-                         searchBySymbolText: String,
-                         isNewCoinsSwitchOn: Boolean,
-                         sortByNameCheckboxIsChecked: Boolean
+    operator fun invoke( isSwitchOn: Boolean = true,
+                         searchBySymbolText: String ="",
+                         isNewCoinsSwitchOn: Boolean = false,
+                         sortByNameCheckboxIsChecked: Boolean = false
     ): Flow<Resource<List<Coin>>> = flow {
         try {
             emit(Resource.Loading<List<Coin>>())
