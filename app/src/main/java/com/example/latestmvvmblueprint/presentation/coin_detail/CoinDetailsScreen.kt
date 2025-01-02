@@ -46,13 +46,20 @@ fun CoinDetailScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "${coin.rank}. ${coin.name} (${coin.symbol})",
+                            text = buildString {
+                                append(coin.rank?.toString() ?: "N/A") // Null kontrolü yapılıyor, varsayılan "N/A"
+                                append(". ")
+                                append(coin.name ?: "Unknown") // Null kontrolü yapılıyor, varsayılan "Unknown"
+                                append(" (")
+                                append(coin.symbol ?: "Symbol Missing") // Null kontrolü yapılıyor, varsayılan mesaj
+                                append(")")
+                            },
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(8f)
                         )
                         Text(
-                            text = if(coin.isActive) "active" else "inactive",
-                            color = if(coin.isActive) Color.Green else Color.Red,
+                            text = if (coin.isActive) "active" else "inactive",
+                            color = if (coin.isActive) Color.Green else Color.Red,
                             fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
                             textAlign = TextAlign.End,
                             modifier = Modifier
@@ -61,8 +68,9 @@ fun CoinDetailScreen(
                         )
                     }
                     Spacer(modifier = Modifier.height(15.dp))
+                    // Null kontrolü ile açıklama
                     Text(
-                        text = coin.description,
+                        text = coin.description ?: "No description available",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(15.dp))
@@ -76,9 +84,10 @@ fun CoinDetailScreen(
                         crossAxisSpacing = 10.dp,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        coin.tags.forEach { tag ->
+                        // Null kontrolü ile tag listesi
+                        coin.tags?.forEach { tag ->
                             CoinTag(tag = tag)
-                        }
+                        } ?: Text("No tags available")
                     }
                     Spacer(modifier = Modifier.height(15.dp))
                     Text(
@@ -87,7 +96,8 @@ fun CoinDetailScreen(
                     )
                     Spacer(modifier = Modifier.height(15.dp))
                 }
-                items(coin.team) { teamMember ->
+                // Null kontrolü ile team listesi
+                items(coin.team ?: emptyList()) { teamMember ->
                     TeamListItem(
                         teamMember = teamMember,
                         modifier = Modifier

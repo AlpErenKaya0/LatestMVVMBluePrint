@@ -45,12 +45,14 @@ fun CoinDetailDto.toCoinDetail(): CoinDetail {
     return CoinDetail(
         coinId = id,
         name = name,
-        description = description,
-        symbol = symbol,
-        rank = rank,
+        description = description?:"",
+        symbol = symbol?:"",
+        rank = rank?:0,
         isActive = isActive,
-        tags = tags.map { it.name },
-        team = team,
-        isNew = isNew
+
+        //nullPointerException hatasının sebebi tags ve team değilmiş.
+        tags = tags?.map { it.name }?: emptyList(),
+        team = team?: emptyList(),
+        isNew = isNew?: false
     )
 }
