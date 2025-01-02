@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +62,17 @@ fun CoinListScreen(
     var justNewDataChecked by remember { mutableStateOf(true) }
     var isNewestCoinsSwitchOn by remember { mutableStateOf(false) }
     var sortByNameCheckboxIsChecked by remember { mutableStateOf(false) }
+
+    //Launched Effect ile initial olarak filterları sanki varmış gibi atıyoruz
+    LaunchedEffect(Unit) {
+        viewModel.FilterElementsStatus(
+            isJustNewDataSwitchOn = justNewDataChecked,
+            searchBySymbolText = searchBySymbolText.text,
+            isNewCoinsSwitchOn = isNewestCoinsSwitchOn,
+            sortByNameCheckboxIsChecked = sortByNameCheckboxIsChecked
+        )
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Switch widget'ı
