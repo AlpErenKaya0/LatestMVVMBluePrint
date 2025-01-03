@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -31,10 +32,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -58,10 +62,19 @@ fun CoinListScreen(
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
-    var searchBySymbolText by remember { mutableStateOf(TextFieldValue("")) }
-    var justNewDataChecked by remember { mutableStateOf(true) }
-    var isNewestCoinsSwitchOn by remember { mutableStateOf(false) }
-    var sortByNameCheckboxIsChecked by remember { mutableStateOf(false) }
+
+
+    val textFieldValueSaver = Saver<TextFieldValue, String>(
+        save = { it.text },
+        restore = { TextFieldValue(it) }
+    )
+    var searchBySymbolText by rememberSaveable(stateSaver = textFieldValueSaver) {
+        mutableStateOf(TextFieldValue(""))
+    }
+
+    var justNewDataChecked by rememberSaveable { mutableStateOf(true) }
+    var isNewestCoinsSwitchOn by rememberSaveable  { mutableStateOf(false) }
+    var sortByNameCheckboxIsChecked by rememberSaveable { mutableStateOf(false) }
 
     //Launched Effect ile initial olarak filterları sanki varmış gibi atıyoruz
 //    LaunchedEffect(Unit) {
@@ -107,18 +120,38 @@ fun CoinListScreen(
             }
 
             Text(
-                text = if (state.isJustNewDataSwitchOn) "All Active Coins" else "All Coins",
+                text = if (justNewDataChecked) "All Active Coins" else "All Coins",
                 modifier = Modifier.padding(16.dp)
             )
+            if(state.coins.isEmpty() && !state.isLoading){
+                Text(
+                    text = "No Coins Found",
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(state.coins) { coin ->
-                    Log.d("CoinListScreen", "This coin has just been added to the screen: ${coin}")
-                    CoinListItem(
-                        coin = coin,
-                        onItemClick = {
-                            if (navController != null) navController.navigate(Screen.CoinDetailScreen.route + "/${coin.id}")
-                        })
+                if (state.isLoading) {
+                    item {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = "Fetching Cryptos...",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+                else {
+                    items(state.coins) { coin ->
+                        Log.d(
+                            "CoinListScreen",
+                            "This coin has just been added to the screen: ${coin}"
+                        )
+                        CoinListItem(
+                            coin = coin,
+                            onItemClick = {
+                                if (navController != null) navController.navigate(Screen.CoinDetailScreen.route + "/${coin.id}")
+                            })
 
+                    }
                 }
             }
         }
@@ -167,7 +200,11 @@ fun CoinListScreen(
                             showBottomSheet = false
 
                         //viewModel'a coroutineScope içinden erişmeme gerek var mı emin değilim
+                        //sıkıntı yaratmıytor ama viewmodel'a veri aktarmanın
+                            // async olarak gerçekleştirilmesi problem yaratabilir
 
+
+                            //LOADİNG EKRANINDA FARKLI BİR GÖRÜNÜM VERİP COİNLERİ GÖSTERMEYELİM.
                             viewModel.FilterElementsStatus(
                                 isJustNewDataSwitchOn = justNewDataChecked,
                                 searchBySymbolText = searchBySymbolText.text.toString(),
@@ -177,6 +214,7 @@ fun CoinListScreen(
 
                         }
                     }
+
                 }
             ) {
                 Text("Apply Filters")
@@ -188,13 +226,16 @@ fun CoinListScreen(
             ) {
                 TextField(
                     value = searchBySymbolText,
+                    onValueChange = {
+                        val forbiddenCharacters = Regex("[şğüöŞĞÜÖ\n\\s+]")
+                        if (!it.text.contains(forbiddenCharacters) && it.text.length <= 10) {
+                            searchBySymbolText = it
+                        }
+                    },
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Words,
-                        keyboardType = KeyboardType.Text
+                        keyboardType = KeyboardType.Text,
                     ),
-                    onValueChange = {
-                        searchBySymbolText = it
-                    },
                     label = { Text(text = "Search a Crypto By Symbol") },
                     placeholder = { Text(text = "Have to search like BTC for Bitcoin") },
                 )

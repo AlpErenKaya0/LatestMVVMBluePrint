@@ -14,10 +14,10 @@ import javax.inject.Inject
 class GetCoinsUseCase @Inject constructor(
     private val repository: CoinRepository
 ) {
-    operator fun invoke( isSwitchOn: Boolean = true,
-                         searchBySymbolText: String ="",
-                         isNewCoinsSwitchOn: Boolean = false,
-                         sortByNameCheckboxIsChecked: Boolean = false
+    operator fun invoke( isSwitchOn: Boolean,
+                         searchBySymbolText: String,
+                         isNewCoinsSwitchOn: Boolean,
+                         sortByNameCheckboxIsChecked: Boolean
     ): Flow<Resource<List<Coin>>> = flow {
         try {
             emit(Resource.Loading<List<Coin>>())
@@ -27,9 +27,10 @@ class GetCoinsUseCase @Inject constructor(
             // Filtreleme işlemleri
             var filteredCoins = coins
 
-            if (searchBySymbolText == null || isSwitchOn == null || isNewCoinsSwitchOn == null || sortByNameCheckboxIsChecked == null){
-                emit(Resource.Success(coins))
-            }
+//            if (searchBySymbolText == null || isSwitchOn == null || isNewCoinsSwitchOn == null || sortByNameCheckboxIsChecked == null){
+//                emit(Resource.Success(coins))
+//            }
+
             // SYMBOL filtreleme
             if (searchBySymbolText.isNotEmpty()) {
                 filteredCoins = filteredCoins.filter {

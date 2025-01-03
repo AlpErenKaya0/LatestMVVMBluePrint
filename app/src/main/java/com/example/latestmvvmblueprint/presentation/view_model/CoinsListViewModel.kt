@@ -17,6 +17,7 @@ class CoinListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state = mutableStateOf(CoinListState())
+    private val _isJustNewDataSwitchOn = mutableStateOf(true)
     private val _searchBySymbolText = mutableStateOf("")
     private val _isNewCoinsSwitchOn = mutableStateOf(false)
     private val _sortByNameCheckboxIsChecked = mutableStateOf(false)
@@ -29,9 +30,7 @@ class CoinListViewModel @Inject constructor(
 
     private fun getCoins() {
         getCoinsUseCase(
-            //Burada initial olarak çekilen listede saçma sapan itemlar gelme noktasında bir
-            //sorun var
-            isSwitchOn = _state.value.isJustNewDataSwitchOn,
+            isSwitchOn = _isJustNewDataSwitchOn.value,
             searchBySymbolText = _searchBySymbolText.value,
             isNewCoinsSwitchOn = _isNewCoinsSwitchOn.value,
             sortByNameCheckboxIsChecked = _sortByNameCheckboxIsChecked.value
@@ -64,7 +63,7 @@ class CoinListViewModel @Inject constructor(
         sortByNameCheckboxIsChecked: Boolean
     ) {
         // Durumları güncelle
-        _state.value = _state.value.copy(isJustNewDataSwitchOn = isJustNewDataSwitchOn)
+        _isJustNewDataSwitchOn.value=  isJustNewDataSwitchOn
         _searchBySymbolText.value = searchBySymbolText.uppercase() // Arama metnini büyük harfe çevir
         _isNewCoinsSwitchOn.value = isNewCoinsSwitchOn
         _sortByNameCheckboxIsChecked.value = sortByNameCheckboxIsChecked
