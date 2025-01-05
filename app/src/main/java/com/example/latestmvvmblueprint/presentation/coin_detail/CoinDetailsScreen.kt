@@ -151,7 +151,7 @@ fun CoinDetailScreen(
 
             if (isAnimating) {
                 LaunchedEffect(Unit) {
-                    // Paralel animasyon
+                    // Paralel animasyonları burada launchlar şeklinde çalıştıracağız
                     launch {
                         offsetY.animateTo(
                             targetValue = 1000f,
