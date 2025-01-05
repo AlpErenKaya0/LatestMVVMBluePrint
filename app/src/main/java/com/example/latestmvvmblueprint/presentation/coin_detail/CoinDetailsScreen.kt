@@ -1,6 +1,9 @@
 package com.example.latestmvvmblueprint.presentation.coin_detail
 
 import android.graphics.fonts.FontStyle
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,9 +43,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,6 +58,8 @@ import com.example.latestmvvmblueprint.presentation.coin_detail.components.CoinT
 import com.example.latestmvvmblueprint.presentation.coin_detail.components.TeamListItem
 import com.example.latestmvvmblueprint.presentation.view_model.CoinDetailViewModel
 import com.google.accompanist.flowlayout.FlowRow
+import kotlinx.coroutines.launch
+
 @Composable
 fun CoinDetailScreen(
     viewModel: CoinDetailViewModel = hiltViewModel()
@@ -59,25 +68,34 @@ fun CoinDetailScreen(
     var isCardOpen by remember { mutableStateOf(true) }
 
 
-    Box(modifier = Modifier.fillMaxSize()
-        .padding(top = 50.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp)
     ) {
-        if (isCardOpen && !state.isLoading && !state.error.isNotBlank() ) {
+        val offsetY = remember { Animatable(0f) }
+        val cardAlpha = remember { Animatable(1f) }
+        var isAnimating by remember { mutableStateOf(false) }
+
+        if (isCardOpen && !state.isLoading && !state.error.isNotBlank()) {
             Spacer(modifier = Modifier.height(15.dp))
             Card(
                 modifier = Modifier
-                    .align(alignment = Alignment.Center)
+                    .align(Alignment.Center)
                     .fillMaxWidth()
                     .fillMaxHeight(0.2f)
                     .padding(16.dp)
-                    .clickable(onClick = {isCardOpen= false})
+                    .offset { IntOffset(0, offsetY.value.toInt()) }
+                    .graphicsLayer(alpha = cardAlpha.value)
+                    .clickable(onClick = {
+                        isAnimating = true
+                    })
                     .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp)),
                 elevation = CardDefaults.cardElevation(8.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = Color.Transparent
                 )
-
             ) {
                 Box(
                     modifier = Modifier
@@ -116,8 +134,9 @@ fun CoinDetailScreen(
                                 .align(Alignment.TopStart)
                                 .padding(16.dp)
                         )
+
                         Text(
-                            text = "Rank: ${state.coin?.symbol ?: "N/A"}",
+                            text = "Symbol: ${state.coin?.symbol ?: "N/A"}",
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -126,6 +145,33 @@ fun CoinDetailScreen(
                                 .align(Alignment.BottomEnd)
                                 .padding(16.dp)
                         )
+                    }
+                }
+            }
+
+            if (isAnimating) {
+                LaunchedEffect(Unit) {
+                    // Paralel animasyon
+                    launch {
+                        offsetY.animateTo(
+                            targetValue = 1000f,
+                            animationSpec = tween(
+                                durationMillis = 4000, // 4 saniye
+                                easing = LinearEasing
+                            )
+                        )
+                    }
+
+                    launch {
+                        cardAlpha.animateTo(
+                            targetValue = 0f,
+                            animationSpec = tween(
+                                durationMillis = 3000,
+                                easing = LinearEasing
+                            )
+                        )
+                        isAnimating = false
+                        isCardOpen = false
                     }
                 }
             }
@@ -143,11 +189,7 @@ fun CoinDetailScreen(
 
 
 
-
-
-
-
-        else {
+    else {
             state.coin?.let { coin ->
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
