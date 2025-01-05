@@ -1,6 +1,9 @@
 package com.example.latestmvvmblueprint.presentation.coin_list
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,22 +15,32 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,6 +89,13 @@ fun CoinListScreen(
     var isNewestCoinsSwitchOn by rememberSaveable  { mutableStateOf(false) }
     var sortByNameCheckboxIsChecked by rememberSaveable { mutableStateOf(false) }
 
+    val listState = rememberLazyListState()
+    val coroutineScrollScope = rememberCoroutineScope()
+    val showButton by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex > 0
+        }
+    }
     //Launched Effect ile initial olarak filterları sanki varmış gibi atıyoruz
 //    LaunchedEffect(Unit) {
 //        viewModel.FilterElementsStatus(
@@ -116,20 +136,35 @@ fun CoinListScreen(
                 }
 
 
-
             }
 
             Text(
                 text = if (justNewDataChecked) "All Active Coins" else "All Coins",
                 modifier = Modifier.padding(16.dp)
             )
-            if(state.coins.isEmpty() && !state.isLoading){
+            AnimatedVisibility(visible = showButton,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                ) {
+                ScrollToTopButton(
+                    onClick = {
+                        coroutineScrollScope.launch {
+                            // Animate scroll to the first item
+                            listState.animateScrollToItem(index = 0)
+                        }
+                    },
+                    modifier = Modifier
+                )
+            }
+            if (state.coins.isEmpty() && !state.isLoading) {
                 Text(
                     text = "No Coins Found",
                     modifier = Modifier.padding(16.dp)
                 )
             }
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = listState
+            ) {
                 if (state.isLoading) {
                     item {
                         Spacer(modifier = Modifier.height(10.dp))
@@ -138,8 +173,7 @@ fun CoinListScreen(
                             modifier = Modifier.padding(16.dp)
                         )
                     }
-                }
-                else {
+                } else {
                     items(state.coins) { coin ->
                         Log.d(
                             "CoinListScreen",
@@ -150,11 +184,16 @@ fun CoinListScreen(
                             onItemClick = {
                                 if (navController != null) navController.navigate(Screen.CoinDetailScreen.route + "/${coin.id}")
                             })
-
                     }
+
                 }
             }
-        }
+
+
+
+
+
+            }
         if(state.error.isNotBlank()){
             Text(
                 text = state.error,
@@ -162,7 +201,7 @@ fun CoinListScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp )
+                    .padding(horizontal = 20.dp)
                     .align(Alignment.Center)
             )
         }
@@ -281,5 +320,24 @@ fun CoinListScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ScrollToTopButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    SmallFloatingActionButton(
+        onClick = onClick,
+        modifier = modifier
+            .padding(16.dp),
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+    ) {
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowUp,
+            contentDescription = "Scroll to top"
+        )
     }
 }
