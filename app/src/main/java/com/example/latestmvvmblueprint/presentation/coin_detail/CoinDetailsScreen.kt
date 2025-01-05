@@ -60,12 +60,13 @@ fun CoinDetailScreen(
 
 
     Box(modifier = Modifier.fillMaxSize()
-        .padding(top = 16.dp)
+        .padding(top = 50.dp)
     ) {
         if (isCardOpen && !state.isLoading && !state.error.isNotBlank() ) {
             Spacer(modifier = Modifier.height(15.dp))
             Card(
                 modifier = Modifier
+                    .align(alignment = Alignment.Center)
                     .fillMaxWidth()
                     .fillMaxHeight(0.2f)
                     .padding(16.dp)
